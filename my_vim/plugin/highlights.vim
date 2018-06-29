@@ -131,30 +131,30 @@ function! s:MatchToggle()
   if exists('g:match_maps') && g:match_maps
     let g:match_maps = 0
     for i in range(0, 9)
-      execute 'unmap <k'.i.'>'
+      execute 'unmap ,'.i
     endfor
-    nunmap <kMinus>
-    nunmap <kPlus>
-    nunmap <kMultiply>
-    nunmap <Leader>f
-    nunmap <Leader>F
-    nunmap <Leader>n
-    nunmap <Leader>N
+    nunmap ,-
+    nunmap ,+
+    nunmap ,*
+    nunmap ,f
+    nunmap ,F
+    nunmap ,n
+    nunmap ,N
   else
     let g:match_maps = 1
     for i in range(1, 9)
-      execute 'vnoremap <silent> <k'.i.'> :<C-U>call <SID>DoHighlight('.i.', 1, v:count)<CR>'
-      execute 'nnoremap <silent> <k'.i.'> :<C-U>call <SID>DoHighlight('.i.', 2, v:count)<CR>'
+      execute 'vnoremap <silent> ,'.i.' :<C-U>call <SID>DoHighlight('.i.', 1, v:count)<CR>'
+      execute 'nnoremap <silent> ,'.i.' :<C-U>call <SID>DoHighlight('.i.', 2, v:count)<CR>'
     endfor
-    vnoremap <silent> <k0> :<C-U>call <SID>UndoHighlight(1)<CR>
-    nnoremap <silent> <k0> :<C-U>call <SID>UndoHighlight(2)<CR>
-    nnoremap <silent> <kMinus> :call <SID>WindowMatches(0)<CR>
-    nnoremap <silent> <kPlus> :call <SID>WindowMatches(1)<CR>
-    nnoremap <silent> <kMultiply> :call <SID>WindowMatches(2)<CR>
-    nnoremap <silent> <Leader>f :call <SID>Search(0)<CR>
-    nnoremap <silent> <Leader>F :call <SID>Search(1)<CR>
-    nnoremap <silent> <Leader>n :let @/=<SID>Search(0)<CR>
-    nnoremap <silent> <Leader>N :let @/=<SID>Search(1)<CR>
+    vnoremap <silent> ,0 :<C-U>call <SID>UndoHighlight(1)<CR>
+    nnoremap <silent> ,0 :<C-U>call <SID>UndoHighlight(2)<CR>
+    nnoremap <silent> ,- :call <SID>WindowMatches(0)<CR>
+    nnoremap <silent> ,+ :call <SID>WindowMatches(1)<CR>
+    nnoremap <silent> ,* :call <SID>WindowMatches(2)<CR>
+    nnoremap <silent> ,f :call <SID>Search(0)<CR>
+    nnoremap <silent> ,F :call <SID>Search(1)<CR>
+    nnoremap <silent> ,n :let @/=<SID>Search(0)<CR>
+    nnoremap <silent> ,N :let @/=<SID>Search(1)<CR>
   endif
   call s:WindowMatches(g:match_maps)
   echo 'Mappings for matching:' g:match_maps ? 'ON' : 'off'

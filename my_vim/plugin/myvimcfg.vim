@@ -3,7 +3,6 @@ set t_Co=256
 set background=dark
 
 if has('win32')
-    lan english
     "colorscheme solarized
     "colorscheme one
     "colorscheme molokai
@@ -12,7 +11,9 @@ if has('win32')
     "colorscheme darkmate
     colorscheme PaperColor
 else
-    colorscheme contrasty
+    "colorscheme contrasty
+    "colorscheme jellybeans
+    colorscheme PaperColor
 endif
 
 set path=.,,**                  " Set search path
@@ -50,6 +51,9 @@ set startofline                 " Jump to non-blank start of line
 set laststatus=2                " Always show the statusline
 set hidden                      " Don't complain about unsaved files when switching buffers.
 set gdefault                    " use g in substitute by default. Adding 'g' flag to the command will now toggle it
+set lazyredraw                  " Don't redraw while executing macros (good performance config)
+set foldcolumn=1                " Add a bit extra margin to the left
+set mouse=a                     " use mouse in all modes
 
 " Easy pasting to windows apps - http://vim.wikia.com/wiki/VimTip21
 " yank always copies to unnamed register, so it is available in windows clipboard for other applications.
@@ -58,7 +62,7 @@ set clipboard=unnamed
  " No Residue files
 set noswapfile
 set nobackup
-set noundofile
+"set noundofile
 
 " Default split to right and below
 set splitbelow
@@ -68,10 +72,11 @@ set splitright
 set wildignore+=*.o,*.d,*.a,*.obj,*.bak,*.exe,*.cfa,*.gz,*.zip,*.bin,*.db,*.dat,*.jpg,*.JPG,*.raw,*.tar,*.out,*.elf
 set wildignore+=*.bmp,*.gif,*.ico,*.jpg,*.png,*.ico
 set wildignore+=*.pdf,*.psd
+set wildignore+=*~,*.pyc
 if has('win32')
     set wildignore+=*\\.git\\*,*\\.hg\\*,*\\.svn\\*  " Windows ('noshellslash')
 else
-    set wildignore+=*/.git/*,*/.hg/*,*/.svn/*        " Linux/MacOSX
+    set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store     " Linux/MacOSX
 endif
 
 " Use wild chars in Vim search
@@ -97,8 +102,8 @@ set sessionoptions+=winpos      " position of the whole Vim window
 " Save file with C-s
 nnoremap <silent><C-s> :w<CR>
 
-" Use ',' to add a space
-nmap , i<Space><Esc>
+" Use '\,' to add a space
+nmap \, i<Space><Esc>
 
 " [ completion options ]
 set complete=.,w,b,t,i,u,k       " completion buffers
@@ -116,6 +121,21 @@ set completeopt-=preview " dont show preview window
 " Netrw config
 let g:netrw_liststyle=1     " Long style listing
 let g:netrw_keepdir=1       " Keep current directory immune from browsing directory
+
+" No annoying sound on errors
+set noerrorbells
+set novisualbell
+set t_vb=
+set tm=500
+
+" Properly disable sound on errors on MacVim
+if has("gui_macvim")
+    autocmd GUIEnter * set vb t_vb=
+endif
+
+" Enable filetype plugins
+filetype plugin on
+filetype indent on
 
 if has("autocmd")
     "autocmd!               " Clear all autocmds in the group
@@ -159,7 +179,6 @@ if has("autocmd")
     au Syntax * RainbowParenthesesLoadRound         " ()
     au Syntax * RainbowParenthesesLoadSquare        " []
     au Syntax * RainbowParenthesesLoadBraces        " {}
-    au Syntax * RainbowParenthesesLoadChevrons      " <>
 endif
 
 " function to toggle the number mode
@@ -206,6 +225,7 @@ set wrap linebreak  " linebreak - Wrap at word boundary
 set sidescroll=5
 set listchars+=precedes:<,extends:>
 set breakat+={}()"|<>&
+set textwidth=500
 
 " magic/nomagic: changes special chars that can be used in search patterns
 set magic
@@ -213,6 +233,26 @@ set magic
     " use \v and \V to switch 'very magic' on or off.
     " \m, \M: 'magic' mode.
     " use \m and \M to switch 'magic' on or off.
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Turn persistent undo on
+"    means that you can undo even when you close a buffer/VIM
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+try
+    if has("win32")
+        set undodir=~/vimfiles/temp_dirs/undodir
+    else
+        set undodir=~/.vim/temp_dirs/undodir
+    endif
+    set undofile
+catch
+endtry
+
+" :W sudo saves the file
+" (useful for handling the permission-denied error)
+if !has("win32")
+    command W w !sudo tee % > /dev/null
+endif
 
 " Use line diff
 noremap \ldt :Linediff<CR>
@@ -250,7 +290,10 @@ nnoremap k gk
 vmap \* omxomy<ESC>`xO/*<ESC>`yo*/<ESC>
 
 " search for visually highlighted text
-vmap // y/<C-R>"<CR>
+" Visual mode pressing * or # searches for the current selection
+" Super useful! From an idea by Michael Naumann
+vnoremap <silent> * :<C-u>call VisualSelection('', '')<CR>/<C-R>=@/<CR><CR>
+vnoremap <silent> # :<C-u>call VisualSelection('', '')<CR>?<C-R>=@/<CR><CR>
 
 " clear the search buffer when hitting return
 nnoremap <CR> :nohlsearch<cr>
@@ -263,6 +306,10 @@ vmap gX y:vimgrep /<C-R>"/ **/*<CR>
 
 " Toggle scrollbind for all open windows in the tab
 nnoremap \j :windo set scb!
+
+" move among buffers with [b,]b
+map [b :bnext<CR>
+map ]b :bprev<CR>
 
 " Use F8 to toggle between binary/hex
 noremap \hx :call HexMe()<CR>
@@ -415,7 +462,71 @@ if exists("+showtabline")
     highlight link TabNum Special
 endif
 
-" CtrlP configuration
+" Close all hidden buffers
+function! DeleteHiddenBuffers()
+  let tpbl=[]
+  let closed = 0
+  call map(range(1, tabpagenr('$')), 'extend(tpbl, tabpagebuflist(v:val))')
+  for buf in filter(range(1, bufnr('$')), 'bufexists(v:val) && index(tpbl, v:val)==-1')
+    if getbufvar(buf, '&mod') == 0
+      silent execute 'bwipeout' buf
+      let closed += 1
+    endif
+  endfor
+  echo "Closed ".closed." hidden buffers"
+endfunction
+
+" Display number of open buffers
+fun! NumberOfOpenBuffers()
+    echo len(getbufinfo({'buflisted':1}))
+endfun
+
+" rebuild cscope, make sure it is called from the right directory
+function! RebuildCscope(total)
+    " Kill all prev connections
+    let l:x = 0
+    while l:x != a:total
+        silent execute 'cs kill '.l:x
+        let l:x = l:x + 1
+    endwhile
+
+    if has('win32')
+        execute '!.\cscope_sym.bat '.a:total
+    else
+        execute '!./cscope_sym.sh '.a:total
+    endif
+    cs add cscope.out
+endfunction
+
+" Helper functions
+function! VisualSelection(direction, extra_filter) range
+    let l:saved_reg = @"
+    execute "normal! vgvy"
+
+    let l:pattern = escape(@", "\\/.*'$^~[]")
+    let l:pattern = substitute(l:pattern, "\n$", "", "")
+
+    if a:direction == 'gv'
+        call CmdLine("Ack '" . l:pattern . "' " )
+    elseif a:direction == 'replace'
+        call CmdLine("%s" . '/'. l:pattern . '/')
+    endif
+
+    let @/ = l:pattern
+    let @" = l:saved_reg
+endfunction
+
+""""""""""""""""""""""""""""""
+" => YankStack
+""""""""""""""""""""""""""""""
+let g:yankstack_yank_keys = ['y', 'd']
+nmap \p <Plug>yankstack_substitute_older_paste
+nmap \P <Plug>yankstack_substitute_newer_paste
+
+"""""""""""""""""""""" Plugin configurations
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => CtrlP
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard'] " use .gitignore to exclude caching of those files
 if has('win32')
     let g:ctrlp_user_command = 'dir %s /-n /b /s /a-d' " Windows
@@ -438,25 +549,25 @@ let g:ctrlp_custom_ignore = {
             \ 'link': 'SOME_BAD_SYMBOLIC_LINKS',
             \ }
 
-" Close all hidden buffers
-function! DeleteHiddenBuffers()
-  let tpbl=[]
-  let closed = 0
-  call map(range(1, tabpagenr('$')), 'extend(tpbl, tabpagebuflist(v:val))')
-  for buf in filter(range(1, bufnr('$')), 'bufexists(v:val) && index(tpbl, v:val)==-1')
-    if getbufvar(buf, '&mod') == 0
-      silent execute 'bwipeout' buf
-      let closed += 1
-    endif
-  endfor
-  echo "Closed ".closed." hidden buffers"
-endfunction
+""""""""""""""""""""""""""""""
+" => MRU plugin
+""""""""""""""""""""""""""""""
+let MRU_Max_Entries = 400
+map _f :MRU<CR>
 
-" Display number of open buffers
-fun! NumberOfOpenBuffers()
-    echo len(getbufinfo({'buflisted':1}))
-endfun
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Git gutter (Git diff)
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:gitgutter_enabled=0
+nnoremap _g :GitGutterToggle<cr>
 
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Ale Lint
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nmap _a <Plug>(ale_next_wrap)
+" Only run linting when saving the file
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_lint_on_enter = 0
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CSCOPE settings for vim
@@ -493,7 +604,8 @@ else
     set csprg=/usr/bin/cscope
 endif
 
-"if (!exists('g:cscope_loaded'))
+let g:cscope_loaded = 0
+if (g:cscope_loaded == 0)
 
     """"""""""""" Standard cscope/vim boilerplate
 
@@ -518,7 +630,7 @@ endif
     set cscopeverbose
 
     " Use relative path from cscope.out directory
-    set nocscoperelative
+    set cscoperelative
 
     """"""""""""" My cscope/vim key mappings
     "
@@ -569,11 +681,11 @@ endif
         "called
         nmap \d :cs find d <C-R><C-W><CR>
         "file
-        nmap \f :cs find f <C-R><C-W><CR>
+        nmap \f :cs find f
         "text
-        nmap \t :cs find t <C-R>=expand("<cword>")<CR><CR>
+        nmap \t :cs find t
         "egrep
-        nmap \e :cs find e <C-R><C-W><CR>
+        nmap \e :cs find e
         "includes
         nmap \i :cs find i <C-R><C-W><CR>
     else
@@ -603,9 +715,9 @@ endif
         nmap \G :tab cs find g <C-R><C-W><CR>
         nmap \C :tab cs find c <C-R><C-W><CR>
         nmap \D :tab cs find d <C-R><C-W><CR>
-        nmap \F :tab cs find f <C-R><C-W><CR>
-        nmap \T :tab cs find t <C-R><C-W><CR>
-        nmap \E :tab cs find e <C-R><C-W><CR>
+        nmap \F :tab cs find f
+        nmap \T :tab cs find t
+        nmap \E :tab cs find e
         nmap \I :tab cs find i <C-R><C-W><CR>
     else
         nmap \S :vert scs find s <C-R>=expand("<cword>")<CR><CR>
@@ -648,4 +760,4 @@ endif
     "
     "set ttimeoutlen=100
 
-"endif
+endif

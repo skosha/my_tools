@@ -1,0 +1,293 @@
+#!/bin/bash
+====================== Brace expansion =================
+{A,B} 	    Same as A B
+{A,B}.js 	Same as A.js B.js
+{1..5} 	    Same as 1 2 3 4 5
+
+====================== Variable ===================
+
+echo $Variable      # => Some string
+echo "$Variable"    # => Some string
+echo '$Variable'    # => $Variable
+
+# Default value for variable
+echo ${Foo:-"DefaultValueIfFooIsMissingOrEmpty"}
+# => DefaultValueIfFooIsMissingOrEmpty
+# This works for null (Foo=) and empty string (Foo=""); zero (Foo=0) returns 0.
+# Note that it only returns default value and doesn't change variable value.
+
+${FOO%suffix} 	    Remove suffix
+${FOO#prefix} 	    Remove prefix
+${FOO%%suffix} 	    Remove long suffix
+${FOO##prefix} 	    Remove long prefix
+${FOO/from/to} 	    Replace first match
+${FOO//from/to} 	Replace all
+${FOO/%from/to} 	Replace suffix
+${FOO/#from/to} 	Replace prefix
+
+${#FOO} 	        Length of $FOO
+
+${FOO:0:3} 	        Substring (position, length)
+${FOO:-3:3} 	    Substring from the right
+${FOO:-val} 	    $FOO, or val if not set
+${FOO:=val} 	    Set $FOO to val if not set
+${FOO:+val} 	    val if $FOO is set
+${FOO:?message} 	Show error message and exit if $FOO is not set
+
+name="John"
+echo ${name}
+echo ${name/J/j}    #=> "john" (substitution)
+echo ${name:0:2}    #=> "jo" (slicing)
+echo ${name::2}     #=> "jo" (slicing)
+echo ${name::-1}    #=> "joh" (slicing)
+echo ${food:-Cake}  #=> $food or "Cake"
+length=2
+echo ${name:0:length}  #=> "jo"
+
+STR="/path/to/foo.cpp"
+echo ${STR%.cpp}    # /path/to/foo
+echo ${STR%.cpp}.o  # /path/to/foo.o
+
+echo ${STR##*.}     # cpp (extension)
+echo ${STR##*/}     # foo.cpp (basepath)
+
+echo ${STR#*/}      # path/to/foo.cpp
+echo ${STR##*/}     # foo.cpp
+
+echo ${STR/foo/bar} # /path/to/bar.cpp
+
+STR="Hello world"
+echo ${STR:6:5}   # "world"
+echo ${STR:-5:5}  # "world"
+
+SRC="/path/to/foo.cpp"
+BASE=${SRC##*/}   #=> "foo.cpp" (basepath)
+DIR=${SRC%$BASE}  #=> "/path/to" (dirpath)
+
+=================== Comments =====================
+
+# Single line comment
+
+: '
+This is a
+multi line
+comment
+'
+
+=================== Loops ========================
+
+for i in /etc/rc.*; do
+  echo $i
+done
+
+for i in {1..5}; do
+    echo "Welcome $i"
+done
+
+for i in {5..50..5}; do
+    echo "Welcome $i"
+done
+
+for ((a=1; a <= 3; a++))
+do
+    echo $a
+done
+
+# This will cat the output from ls.
+for Output in $(ls)
+do
+    cat "$Output"
+done
+
+while true; do
+  ···
+done
+
+
+cat file.txt | while read line; do
+  echo $line
+done
+
+==================== Functions ===========================
+
+function myfunc() {
+    echo "hello $1"
+}
+# => Arguments work just like script arguments: arg1 arg2
+myfunc "John"
+
+myfunc() {
+    local myresult='some value'
+    echo $myresult
+}
+result=$(myfunc)
+
+
+myfunc() {
+  return 1
+}
+if myfunc; then
+  echo "success"
+else
+  echo "failure"
+fi
+
+$# 	Number of arguments
+$* 	All arguments
+$@ 	All arguments, starting from first
+$1 	First argument
+
+============ Conditions =================
+[ -z STRING ] 	        Empty string
+[ -n STRING ] 	        Not empty string
+[ NUM -eq NUM ] 	    Equal
+[ NUM -ne NUM ] 	    Not equal
+[ NUM -lt NUM ] 	    Less than
+[ NUM -le NUM ] 	    Less than or equal
+[ NUM -gt NUM ] 	    Greater than
+[ NUM -ge NUM ] 	    Greater than or equal
+[[ STRING =~ STRING ]] 	Regexp
+(( NUM < NUM )) 	    Numeric conditions
+[ -o noclobber ] 	    If OPTIONNAME is enabled
+[ ! EXPR ] 	            Not
+[ X ] && [ Y ] 	        And
+[ X ] || [ Y ] 	        Or
+
+[ -e FILE ] 	        Exists
+[ -r FILE ] 	        Readable
+[ -h FILE ] 	        Symlink
+[ -d FILE ] 	        Directory
+[ -w FILE ] 	        Writable
+[ -s FILE ] 	        Size is > 0 bytes
+[ -f FILE ] 	        File
+[ -x FILE ] 	        Executable
+[ FILE1 -nt FILE2 ] 	1 is more recent than 2
+[ FILE1 -ot FILE2 ] 	2 is more recent than 1
+[ FILE1 -ef FILE2 ] 	Same files
+
+if [ -z "$string" ]; then
+  echo "String is empty"
+elif [ -n "$string" ]; then
+  echo "String is not empty"
+fi
+
+# Regex
+if [[ "A" =~ "." ]]
+
+if (( $a < $b ))
+
+============================ Case ================================
+case "$1" in
+  start | up)
+    vagrant up
+    ;;
+
+  *)
+    echo "Usage: $0 {start|stop|ssh}"
+    ;;
+esac
+
+case "$Variable" in
+    #List patterns for the conditions you want to meet
+    0) echo "There is a zero.";;
+    1) echo "There is a one.";;
+    *) echo "It is not null.";;
+esac
+
+=========================== Arrays ==============================
+
+
+Fruits=('Apple' 'Banana' 'Orange')
+
+Fruits[0]="Apple"
+Fruits[1]="Banana"
+Fruits[2]="Orange"
+
+
+
+echo ${Fruits[0]}           # Element #0
+echo ${Fruits[@]}           # All elements, space-separated
+echo ${#Fruits[@]}          # Number of elements
+echo ${#Fruits}             # String length of the 1st element
+echo ${#Fruits[3]}          # String length of the Nth element
+echo ${Fruits[@]:3:2}       # Range (from position 3, length 2)
+
+Fruits=("${Fruits[@]}" "Watermelon")    # Push
+Fruits=( ${Fruits[@]/Ap*/} )            # Remove by regex match
+unset Fruits[2]                         # Remove one item
+Fruits=("${Fruits[@]}")                 # Duplicate
+Fruits=("${Fruits[@]}" "${Veggies[@]}") # Concatenate
+lines=(`cat "logfile"`)                 # Read from file
+
+for i in "${arrayName[@]}"; do
+  echo $i
+done
+
+========================== Calculations ===============================
+
+
+$((a + 200))      # Add 200 to $a
+
+$((RANDOM%=200))  # Random number 0..200
+
+====================== Options ================================
+
+set -o noclobber    # Avoid overlay files (echo "hi" > foo)
+set -o errexit      # Used to exit upon error, avoiding cascading errors
+set -o pipefail     # Unveils hidden failures
+set -o nounset      # Exposes unset variables
+set -o nullglob     # Non-matching globs are removed  ('*.foo' => '')
+set -o failglob     # Non-matching globs throw errors
+set -o nocaseglob   # Case insensitive globs
+set -o globdots     # Wildcards match dotfiles ("*.sh" => ".foo.sh")
+set -o globstar     # Allow ** for recursive matches ('lib/**/*.rb' => 'lib/a/b/c.rb')
+
+================================ Redirection =================================
+
+python hello.py > output.txt   # stdout to (file)
+python hello.py >> output.txt  # stdout to (file), append
+python hello.py 2> error.log   # stderr to (file)
+python hello.py 2>&1           # stderr to stdout
+python hello.py 2>/dev/null    # stderr to (null)
+
+python hello.py < foo.txt
+
+=============================== Random ==============================
+# trap errors
+traperr() {
+  echo "ERROR: ${BASH_SOURCE[1]} at about ${BASH_LINENO[0]}"
+}
+
+set -o errtrace
+trap traperr ERR
+
+# reading input
+echo -n "Proceed? [y/n]: "
+read ans
+echo $ans
+read -n 1 ans    # Just one character
+
+# printf
+printf "Hello %s, I'm %s" Sven Olga
+#=> "Hello Sven, I'm Olga
+
+# special characters
+$? 	Exit status of last task
+$! 	PID of last background task
+$$ 	PID of shell
+
+# If you get too much output in your terminal, or from a script, the command
+# `clear` clears your screen
+clear
+
+# Expressions are denoted with the following format:
+echo $(( 10 + 5 )) # => 15
+
+# Commands can be substituted within other commands using $( ):
+# The following command displays the number of files and directories in the
+# current directory.
+echo "There are $(ls | wc -l) items here."
+
+# The same can be done using backticks `` but they can't be nested - the preferred way
+# is to use $( ).
+echo "There are `ls | wc -l` items here."

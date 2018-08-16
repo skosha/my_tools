@@ -1,0 +1,530 @@
+VERSION 0.1
+
+Changelist =>
+
+23/05/2018:
+- added basic search and replace
+
+
+/****************** Open/Close ************************/
+vim <filepath> - opens file in Vim. Tip: add an alias in .bashrc for vi to use
+vim
+:q - quit, will complaint if modified and not saved
+:q! - quit without saving
+:w - save
+:w <new_filename> - save as
+:wq - save & quit. Another shortcut for it 'ZZ'
+:e! - discard unsaved changes
+:e <filepath> - open another file in the same buffer (i.e. at the same place)
+
+/****************** Modes *************************/
+Vim has
+1. Normal mode - mostly used in this mode. Vim starts in normal mode. Major
+   functionalities:
+    - navigate
+    - cut/copy/paste
+    - enter other modes
+    To enter normal mode use <Esc> from any mode
+2. Insert mode - used to edit the file
+    - edit
+    To enter insert mode from normal mode:
+    i - enters insert mode at the current cursor
+    I - enters insert mode at the beginning of the line
+    a - enters insert mode after the current cursor
+    A - enters insert mode at the end of the line
+    o - creates a newline below the cursor and enters insert mode
+    O - creates a newline above the cursor and enters insert mode
+    To exit insert mode - <Esc>
+3. Visual mode - visually select blocks of file and edit
+    To enter visual mode from normal mode:
+    v - enters visual mode at current cursor. Move the cursor to desired
+    location to visually select text
+    V - enters line visual mode. Visually selects the entire line
+    <Ctrl-v> - block visual mode
+    To exit visual mode - <Esc>
+4. Command mode - run commands (vim commands, shell commands)
+    To enter command mode from normal mode:
+    : - enters command mode
+    On executing the command, the command mode is terminated at the end of the
+    command
+    Else, to exit command mode without executing - <Esc>
+5. Search mode - search for pattern
+    To enter search mode from normal mode:
+    / - forward search mode
+    ? - backward search mode
+
+/********************* Basic configuration for programmers ****************/
+Vim can be configured by updating .vimrc or through a plugin.
+.vimrc resides in your home directory.
+Plugins can be added by adding <home>/.vim/plugin directory and then adding
+<plugin>.vim files to it.
+I suggest to configure Vim through a plugin and not update the .vimrc.
+
+Steps:
+1. Create <home>/.vim/plugin/myvimcfg.vim
+2. Add the following configuration:
+syntax on
+set t_Co=256
+set background=dark
+set path=.,,**                  " Set search path
+set path+=./**                  " Add the current directory to path
+set autoindent                  " set auto indent on
+set smartindent                 " Set smart indent on
+set smarttab                    " Set smart tabbing on
+set shiftwidth=4                " Shiftwidth to be 4
+set expandtab                   " Expand tab to spaces
+set tabstop=4                   " 1 tab = 4 spaces
+set number                      " line numbers
+set showmatch                   " Show the matching bracket
+set matchtime=1                 " shorten the jump time for showmatch
+set ignorecase                  " Ignore case in search
+set smartcase                   " Ignore case in searches excepted if an uppercase letter is used
+set hls                         " Highlight search
+set incsearch                   " Incremental search
+set matchpairs+=<:>             " Add < > to match pairs command
+set ruler                       " Set ruler on
+ " No Residue files
+set noswapfile
+set nobackup
+set noundofile
+
+3. save the file
+
+/****************** Navigation ***************************/
+New version of Vim supports arrow keys, page up/down, home and end buttons; and
+makes navigation easier. The arrow keys work in normal, insert and visual modes.
+
+Non-arrow keys to navigate (normal mode only):
+h - left arrow
+j - down arrow (actually moves down a line, so if a line is wrapped it will
+move dow to next numbered line instead of next visual line)
+k - up arrow (same as j for wrapped lines)
+l - right arrow
+gj - down arrow for wrapped line
+gk - up arrow for wrapped line
+Adding a number to before the navigation key allows to automatically repeat
+the action for the specified number. eg '3k' will move up 3 lines
+
+^ - move to the beginning of line
+$ - move to the end of line
+0 - move to first non-blank character of the line
+gg - move to beginning of first line of the file
+G - move to beginning of last line of the file
+<num>G - move to line number <num>. another way is to use a command. Enter
+command mode and write the line number and enter. eg :50 goes to line 50
+<num>| - move to the <num> column in the same line
+
+There are ways to navigate based on words:
+w - go to beginning of next word (a word is delimited with space as well as other special
+characters like '/' ',' '.' etc.)
+W - go to beginning of next word (this considers words as delimited by <space> only) Tip:
+Try 'w' and 'W' on <space> and see the difference.
+e - go to end of next word (word delimited with <space> and other characters)
+E - go to end of next word (word delimited with <space> only)
+b - go to beginning of previous word (word delimited with <space> and other characters)
+B - go to beginning of previous word (word delimited with <space> and other characters)
+Adding a number to before the navigation key allows to automatically repeat
+the action for the specified number. eg '3w' will move forward 3 words
+
+Navigation based on next character:
+t<character> - move cursor a character before next <character> in current line
+f<character> - move cursor on the next <character> in current line
+T<character> - move cursor a character before previous <character> in current line
+F<character> - move cursor on the previous <character> in current line
+; - repeats the last 'f' or 't' command without having to type the two
+characters again.
+
+Note: These commands are case sensitive. They would match the case of the
+<character> specified.
+
+ex: The quick brown fox jumps over the lazy dog.
+    ^
+'fb' will result in:
+The quick brown fox jumps over the lazy dog.
+          ^
+
+Navigate based on paragraph (works even with code):
+( - jump back one sentence (in code, this will just move based on line
+breaks. Not very useful for programming.)
+) - jump forward one sentence
+{ - jump back one paragraph (in code, this will go to the previous function
+level '{'. Very useful to navigate code function by function)
+} - jump forward one paragraph
+
+Navigation based on code:
+With cursor on any of '{' '}' '(' ')' '[' ']' '<' '>' and then pressing '%' navigates
+to the matching pair of it.
+
+Navigation based on bookmarks:
+A bookmark can be added to any place and then jumped to from anywhere. It also
+works across open files in the same vim session.
+m<a-z> - mark a bookmark and name it <a-z>. eg, 'ma' will create a bookmark
+named 'a'.
+'<a-z> - jump to bookmark named <a-z>
+
+. is a special bookmark, which is maintained by Vim with the last edit's
+location. So anytime one can jump to the last edit's location by typing '.
+
+Navigation based on edits:
+g; - jumps backward in the changelist (jumps lines)
+g, - jumps forward in the changelist (jumps lines)
+
+Navigation based on visits:
+Vim remembers the locations you have recently visited (where you jumped from).
+This even works across multiple files open in the same window
+<Ctrl-o> - jump backwards in location visited list
+<Ctrl-i> - jump forwards in location visited list
+
+/************************* Basic Editing **************************/
+>>>>>>>>
+'y' is used for copy, 'd' for cut, and 'p' for paste. These commands are all
+normal mode commands. 'y' and 'd' are movement based commands, typing 'y' or
+'d' starts the copy/deletion process ie 'y' + <navigation command>, meaning
+they would cut/copy from the cursor till the next movement specified by the
+navigation commands in the previous section. A number can be added before the
+command to repeat it that many times.
+
+Note: the letters 'd' and 'y' come from delete and yank. Makes it easy to
+remember what they are used for.
+
+A special command is 'dd' and 'yy' - cuts/copies the current line despite of
+where the cursor is.
+Another special command is to cut by character - 'x'. 'x' cuts the character
+under cursor. '3x' will cut character under cursor + 2 characters after it.
+'X' will cut the character previous to the cursor
+
+'p' pastes after the cursor whatever was cut/copied using the 'y' or 'd'
+commands.
+'P' pastes before the cursor
+The cut/copied data is not overwritten till next cut/copy and can be pasted as
+many times as needed. Thus the paste command also works with numbers. So '3p'
+will paste 3 times.
+
+Note: lines cut/copied using 'dd' or 'yy' will paste as a new line and not in
+the same line as the cursor
+
+Example 1:
+The quick brown fox jumps over the lazy dog.
+          ^
+'dw' cuts 'brown '
+The quick fox jumps over the lazy dog.
+          ^
+
+Example 2:
+The quick brown fox jumps over the lazy dog.
+          ^
+'3dw' cuts 'brown fox jumps '
+The quick over the lazy dog.
+          ^
+
+Example 3:
+The quick brown fox jumps over the lazy dog.
+          ^
+'dff' cuts 'brown f'
+The quick ox jumps over the lazy dog.
+          ^
+
+Example 4:
+The quick brown fox jumps over the lazy dog.
+          ^
+'d$' cuts till end of line
+The quick
+          ^
+Note: there is a shortcut for cutting till end of line - 'D'
+
+More examples:
+3dd - cut 3 lines (current + next 2)
+dG - cut till end of file
+d$ - cut till end of line
+d'a - cut till bookmark <a>; this one is very useful in cutting/copying blocks
+
+>>>>>>>>
+'r' is used for replacing a single character
+The quick brown fox jumps over the lazy dog.
+          ^
+'rg' would result in:
+The quick grown fox jumps over the lazy dog.
+          ^
+
+'R' is used to replace the current character and move to next and keep in
+replace mode. Helps in replacing multiple characters. To come out of the
+replace mode, hit <Esc>
+The quick brown fox jumps over the lazy dog.
+          ^
+'Rblue <Esc>' would result in:
+The quick blue  fox jumps over the lazy dog.
+          ^
+
+>>>>>>>>
+'s' is a shortcut for 'x' + enter the insert mode. It saves typing the 'i' to
+enter the insert mode.
+'S' deletes the whole line and enters the insert mode
+
+>>>>>>>>
+'d' and 'y' can also be used from the command line. The use-case for this type
+will be to specify the range.
+
+e.g.
+:20,30 d - delete lines 20 to 30
+
+'t' and 'm' can be used for copy and move from the command line
+:20,30 t 40 - copy lines 20-30 and paste them at line 40
+:20,30 m 40 - delete lines 20-30 and paste them at line 40
+
+'p' in command line is not used for paste but for print
+:20,30 p - will just open a new buffer in a split and display the contents of
+line 20 to 30.
+
+>>>>>>>>
+Be lazy and don't repeat the same commands! If an action needs to be repeated
+again, don't type it again. Use '.' - it repeats the last edit
+'.' also works on typing. Enter insert mode and type whatever needed, hit
+<Esc> and then move cursor and press '.', the last type will be typed again.
+
+Example:
+The quick brown fox jumps over the lazy dog.
+          ^
+'dtf'
+The quick fox jumps over the lazy dog.
+          ^
+'.'
+The quick fox jumps over the lazy dog.
+          ^
+'.'
+The quick fox jumps over the lazy dog.
+          ^
+'.'
+The quick fox jumps over the lazy dog.
+          ^
+
+>>>>>>>>
+u - undos the last edit.
+<Ctrl-r> - redo
+
+/************************* Registers **************************/
+Vim puts the cut/copied data into registers. These registers can be thought of
+as internal buffers maintained by Vim. They are used for a variety of
+purposes. A list of all the registers can be seen by typing :reg .
+
+Vim's registers are named and accessd by some special characters, numbers and
+letters. To access them, they are preceded with a double quote ("). So
+register 0 is "0 or register a is "a.
+
+Vim has a default register that can be accessed with "". Any text that you
+delete (with d, c, s or x) or yank (with y) will be placed there, and that’s
+what Vim uses to paste, when no explicit register is given.
+
+When a new piece of text is yanked, the default register is overwritten with the
+new text, but the previous text is pushed to registers "1-"9.
+Register "0 holds the most recent yanked text.
+
+Register "_ holds the last delete which was less than a line.
+        This register also doubles as a blackhole register, writing to this
+        register will not affect any other registers. So if you want to delete
+        a piece of text without affecting the "" and "1-"9 registers, just
+        delete it into "_ register.
+
+Register ". holds the last inserted text (the one you type with i, a, o etc).
+
+Register ":	holds the most recent executed command-line.
+
+Register "% holds the name of the current file. Comes it really handy if you
+just want to paste the name of the file inside the file somewhere
+
+Register "# holds the name of the alternate file. (If you have more files open
+in the window)
+
+Register "\ holds the most recent search pattern
+
+Register "* holds the last selected text. Works only in GUI versions.
+
+Register "+ is same as "* on windows systems but is used for system clipboard
+on other systems if xterm_clipboard feature is present.
+
+Registers %, #, :, *, + and . are read-only. All other registers can be overwritten
+explicitly by adding them to the delete/yank commands.
+
+Register "a to "z are called named registers and gives users flexibility to
+use them at their discretion.
+
+To delete/yank into a register, precede the delete/yank command with the
+register name.
+e.g. "adw - delete till the word boundary into register "a.
+     "ap - will paste anything in the register a
+
+Vim adds more magic to these registers by allowing users to actually
+concatenate to existing registers. To append to any named register just use
+the capital letter to access the register. "A will append to the register "a.
+
+/************************* Basic Search and Replace **************************/
+Vim's search is very powerful and allows to use extremely advanced search
+options. Some of the basic one's to begin with:
+
+>>>>>>>>
+/foo - search for next occurance of 'foo' in the file. The search wraps around
+       at the end of the file
+?foo - search for previous occurance of 'foo' in the file. The search wraps around
+       at the start of the file
+
+The search results are updated internally in a list which can be navigated
+with 'n' and 'N' in forward and backward directions.
+
+Some shortcuts are built into the system to make searching faster:
+* - search for entire word under the cursor. So, if searching for 'foo' with
+    '*', it will not search 'foobar'.
+g* - will search for the word under cursor without word boundary restriction.
+     So, using 'g*' for 'foo' will search 'foobar'
+# - will search for the word under cursor backwards.
+g# - will search for the word under cursor without word boundary restriction,
+    backwards
+
+By default the search in Vim is case sensitive. There are different ways to
+make the search case insensitive:
+1. ':set ignorecase' - in the command mode will set all search to be case
+   insensitive for the current window/tab. To unset it use - ':set
+   noignorecase'
+2. add \c in your pattern to make that one-off search case insensitive.
+   Similarly \C can be used to make one-off search case sensitive.
+3. Add 'set ignorecase' in vim configuration file to make it permanent.
+
+Making search better through Vim configuration file:
+set ignorecase                  " Ignore case in search
+set smartcase                   " Ignore case in searches excepted if an uppercase letter is used
+set hls                         " Highlight search
+set incsearch                   " Incremental search, searches as the pattern is typed
+
+>>>>>>>>
+Search and replace is done in command mode by command called substitute and
+called with only 's':
+:%s/<pattern>/<replacement>/<options>
+Here,
+% - search on each line of the line
+s - search and replace command
+<pattern> - pattern to search for
+<replacement> - pattern to be replaced with
+<options> - optional, used to modify the search scope and behaviour
+
+Search and replace is best explained using examples:
+:%s/foo/bar/ - search for 'foo' on each line and replace with 'bar'. This will
+    do the operation on only the first occurance of 'foo' on any line and then
+    move to the next line.
+:%s//bar/ - will search for the last search pattern and replace it with 'bar'
+:%s/foo/bar/g - will do it for each occurance of 'foo' in the entire file. So
+    'g' is the most used option and is almost always present in all the search
+    and replaces. The g flag means global – each occurrence in the line is
+    changed, rather than just the first
+:%s/foo/bar/gc - adding 'c' in options will ask for confirmation for each
+    replacement. Type a 'y' to replace and move to next occurance, or 'n' to
+    leave the current occurance unmodified and move to next one. 'a' is used to
+    say to replace all the occurances. Also when using the c flag, Vim will jump
+    to the first match it finds starting from the top of the buffer and prompt
+    you for confirmation to perform replacement on that match.
+:%s/foo//g - search for 'foo' on each line and delete it
+:%s/foo/bar/gi - search for 'foo' case insensitive and replace with bar
+                /c in the pattern can also be used instead of i
+:%s/foo/bar/gI - search for 'foo' case sensitive and replace with bar
+                /C in the pattern can also be used instead of I
+
+% is basically a range (beginning of file to end of file) and can be substituted
+with other ranges.
+:s/foo/bar/g - only one current line
+:20s/foo/bar/g - only on line number 20
+:%s/foo/bar/g - whole file
+:5,12s/foo/bar/g - between lines 5 to 12 (inclusive)
+:'a,'bs/foo/bar/g - between bookmarks 'a' and 'b' (inclusive)
+:.,$s/foo/bar/g - from current line (.) to end of file ($) inclusive
+:.,+2s/foo/bar/g - current + next 2 line
+:-2,+2s/foo/bar/g - previous 2 lines to next 2 lines
+
+<Ctrl-r><Ctrl-w> is used to fill the word under cursor into the command line.
+This comes is very handy for the search and replace. Its not particularly
+useful with / as we already have the shortcut *, but with :s it makes a very
+useful keyboard shortcut to remember.
+
+<Ctrl-r><Ctrl-a> is same as <Ctrl-r><Ctrl-w> except that the word delimited
+only by whitespace is used in this case.
+
+<Ctrl-r><register_name> can be used to insert the contents of registers into
+command line. (Look at the section registers.) Note: here the register name is
+needed, so the " must be omitted.
+
+/************************* Vim Patterns ******************************/
+Vim search patterns are a book in itself.  Vim provides such a vast array of
+options to create a search pattern, it would takes forever to teach them, its
+best to just keep learning as you go. Google and find each time you have a new
+requirement for your search pattern.
+
+., *, \, [, ], ^, and $ are metacharacters and need to be escaped in order to
+use them as normal characters.
+. - matches any character
+* - matches 0 or more of previous atom (an atom will becomre more clear later)
+\ - escape leader
+[] - used for any character specified inside the []
+^ - start-of-line (at start of pattern)
+$ - end-of-line (at end of pattern)
+
++, ?, |, &, {, }, (, and ) must be escaped to use their special function.
+\+ - matches 1 or more of previous atom
+\? - Matches 0 or 1 of the preceding atom, as many as possible.
+    eg. foo\? matches "fo" and "foo"
+\| - separating alternatives
+\( and \) - grouping into an atom
+
+Some basic ones that I have found handy in my time vimming:
+
+\< and \> can be used in the search pattern to limit beginning of a word and
+end of a word.
+examples:
+/\<foo - searches 'foo', 'foobar' but not 'barfoo'
+/foo\> - searches 'foo', 'boofar' but not 'foobar'
+/\<foo\> - searches for 'foo' but not 'foobar' and 'barfoo'
+
+/************************* Repeating commands ******************************/
+Vim allows to repeat a command again without having to type the entirety of
+the command again.
+
+>>>>>>>>>>>>>> Single Repeat
+. - Repeat last change. Can be used with [count] to make it repeat [count]
+times.
+@: - Repeats last command. Can be used with [count] to make it repeat [count]
+times.
+
+>>>>>>>>>>>>>> Multi Repeat
+Global allows to repeat a command multiple times in a file. The command can be
+called by its shorthand 'g'.
+
+:[range]g/<pattern>/[cmd] - execute the [cmd] on lines in [range] that contain the <pattern>
+[range] is the range. Remember % . 20,30 etc.
+if [cmd] is not specified it defaults to 'p' - which is print
+
+'v' is the negative of 'g'.
+:[range]v/<pattern>/[cmd] - execute the [cmd] on lines in [range] that do not contain the <pattern>
+
+The global commands work by first scanning through the [range] lines and marking
+each line where a match occurs (for a multi-line pattern, only the start of the
+match matters).
+In a second scan the [cmd] is executed for each marked line, as if the cursor
+was in that line.  For ":v" the command is executed for each not marked line.
+If a line is deleted its mark disappears.
+The default for [range] is the whole buffer (1,$).  Use "CTRL-C" to interrupt
+the command.  If an error message is given for a line, the command for that line
+is aborted and the global command continues with the next marked or
+unmarked line.
+
+To repeat a non-Ex command, you can use the ":normal" command: >
+	:g/<pattern>/normal {commands}
+Make sure that {commands} ends with a whole command, otherwise Vim will wait for
+you to type the rest of the command for each match.  The screen will not have
+been updated, so you don't know what you are doing.
+
+The undo/redo command will undo/redo the whole global command at once. The
+previous context mark will only be set once (with "''" you go back to where the
+cursor was before the global command).
+
+The global command sets both the last used search pattern and the last used
+substitute pattern.
+
+>>>>>>>>>>>>>> Multi Repeat
+/************************* Intermediate Editing **************************/
+>>>>>>>>
+

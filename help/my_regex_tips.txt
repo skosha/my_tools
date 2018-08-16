@@ -1,0 +1,58 @@
+/* Match Characters literally
+\Q ... \E
+
+/* DOS/Windows CRLF line break */
+\cM\cJ
+
+/* Single character out of a character class */
+[...]
+
+/* Does not match the character class */
+[^...]
+
+/* Shorthand for character classes */
+\d - digits
+\w - word characters (letters, digits, and underscores)
+\s - whitespace (spaces, tabs, and linebreaks)
+
+/* Negated version of character classes */
+\D - not a digit
+\W - not a word character
+\S - not a whitespace
+
+/* Boundary between a word and non-word character */
+\b
+
+/* Optional character */
+? - abc? matches ab or abc
+?? - abc?? matches ab or abc
+
+/* Repeat a character */
+* - previous item 0 or more times
++ - repeats the previous item once or more
+{n} - a{3} matches aaa
+{n, m} - a{2, 4} matches aa, aaa, aaaa
+{n,} - a{2,} matches aa, aaa, aaaa, ...
+
+/* Turn on/off case insensitivity */
+(?i) - turn on
+(?-i) - turn off
+
+\v or very magic (usually) reduces backslashing
+
+========================== Vim ==============================
+/* Search for either planetAwesome or planetTerrible */
+/planet\(Awesome\|Terrible\)
+
+/* Start at beginning of the string */
+^
+
+/* Fail if (negative backtrack) */
+\@! - Matches with zero width if the preceding atom does NOT match at the current position.
+Example: ^\(.*\<bar\>\)\@! - a line with word 'bar' not in it
+
+650-555-2345
+(416)555-3456
+202 555 4567
+4035555678
+1 416 555 9292

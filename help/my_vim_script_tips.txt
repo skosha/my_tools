@@ -1,0 +1,5 @@
+# Get the word under cursor
+expand('<cword>')
+
+# current column
+col('.')

@@ -1,0 +1,498 @@
+/* Macros */
+record - q<x>
+play - @<x>
+repeat - @@
+paste - "<x>p
+
+/* Use named buffers */
+copy - "<x><copy command>
+paste - "<x>p
+
+/* Fold a function */
+zf% - fold a function
+zo - open the fold
+zf#j - fold next # lines
+zf/string - fold till string
+zj or zk - move between folds
+zM - close all open folds
+zm - increases fold level by 1
+zR - open all close folds
+zr - decreases fold level by 1
+zd - delete fold
+zE - delete all folds
+:mkview - save folds
+:loadview - reload folds
+au BufWinLeave * mkview
+au BufWinEnter * silent loadview
+
+/* Visual mode */
+V - linewise
+o - move to other end
+O - move to other corner
+aw - mark a word
+ab - mark () block
+aB - mark {} block
+ib - mark inner () block
+iB - mark inner {} block
+
+/* Marks */
+'a-z    - same file
+'A-Z    - beteween files
+
+/* Sort a list */
+ma
+move to last line of interest
+!'asort
+
+/* Abbr */
+ab #b /**************************************************************
+ab #e **************************************************************/
+
+/* Insert literal character */
+<Ctrl-V>[Key]
+
+/* Paste with re-indentation */
+[p
+
+/* Change Word */
+cw
+
+/* Jump back to last edited line */
+'.
+
+/* Jump to the last non-blank character in a line */
+g_
+
+/* Jump to Nth % of the file */
+N%
+
+/* Go to the position where you were in NORMAL MODE while last closing the file. */
+`.
+
+/* Go to the position where you were in INSERT MODE while last closing the file. */
+`^
+
+/* Increment/Decrement a number */
+Ctrl-A/Ctrl-X
+
+/* Repeat last command */
+.
+
+/* Mini calculator */
+in Insert mode
+Ctlr-R
+=5*5 (inserts 25 into text)
+
+/* Last inserted text */
+in Insert mode
+Ctrl-A
+
+/* Move back/forward in jumplist */
+Ctrl-O/Ctrl-I
+:jumps (opens jumplist)
+
+/* Go back to location before long jump */
+``
+
+/* Move forward/back in change list */
+g, g;
+:changes (opens changelist)
+
+/* Delete all the text inside the brackets */
+di(
+
+/* Delete all the text inside the brackets including the bracket */
+da(
+
+/* Ignore or match cases dynamically */
+/\cfoo or /\Cfoo
+
+/* Page Down & Page Up */
+Ctrl-f & Ctrl-b
+
+/* Half Page Down & Half Page Up */
+Ctrl-u & Ctrl-d
+
+/* Open command/search window */
+q: q/
+
+/* Open last file */
+'0
+
+/* Alternate file */
+Ctrl-6
+
+/* Close with save */
+:x
+ZZ
+
+/* Close without save */
+ZQ
+
+/* Indent a whole code block */
+=aB
+
+/* Indent/de-indent in Insert or Replace mode */
+Ctrl-Shift-t Ctrl-Shift-d
+
+/* Delete a paragraph */
+dap
+
+/* Delete a code block */
+daB (including braces)
+diB (excluding braces)
+
+/* Delete within quotes "" */
+da" (including "")
+di" (excluding "")
+
+/* Using spell check */
+echo $spelllang
+set spelllang=en
+set spell
+set nospell
+[s and ]s for navigation
+z= list of suggestions
+zg save in dictionary
+zw add word to bad word list
+
+/* Undoing */
+:earlier 1h
+:later 20m
+g- g+ (navigating through undo branches)
+
+/* Auto-complete */
+Ctrl-n
+Ctrl-x Ctrl-f (filename)
+Ctrl-x Ctrl-o (omni completion)
+
+/* Vim diff */
+vi -d file1 file2 file3
+]c and [c (navigate differences)
+do (get other files diff)
+dp (put diff to other file)
+:vert diffsplit file2
+
+/* Adding todays date */
+!!date (in Normal mode)
+
+/* First usage of current variable */
+gd
+
+/* Special movements */
+[{ go to previous unmatched '{'
+]} go to previous unmatched '}'
+[# go to previous unmatched #if or #else (great for finding which #if the current code is under)
+]# go to next unmatched #else or #endif
+][ go to next '}' (end of function)
+[] go to previous '}' (end of function)
+[* or [/ go to previous start of a c-style comment (need not be unmatched)
+]* or ]/ go to next end of c-style comment (need not be unmatched)
+[( go to previous unmatched '('
+]) go to next unmatched ')'
+
+/* Navigate in wrapped lines */
+gj moves down one screen line instead of a logical line
+
+/* Insert line numbers in file */
+:%!cat -n %
+
+/* Delete end of line blanks */
+:%s=  *$==
+
+/* Delete end of line blanks and DOS ^M */
+:%s#\s*\r\?$##
+
+/* Lower case /Upper case the entire line */
+Vu VU
+
+/* Case change */
+"HellO" to "hELLo" - g~ + movement
+"HellO" to "HELLO" - gU + movement
+"HellO" to "hello" - gu + movement
+g~iw - toggle case of current word
+g~3w - toggle case of next three words
+g~~ - toggle case of current line
+g~$ - toggle case till end of line
+
+/* Split window and open integrated file explorer */
+:Vex
+
+/* Resize windows */
+Ctrl-w| maximize window in vertical split
+Ctrl-w_ maximize window in horizontal split
+Ctrl-w= all windows of same size
+Ctrl-wo close all windows except current one
+
+/* Delete last word typed in insert mode */
+Ctrl-w
+Ctrl-h - delete prev character
+Ctrl-u - delete entire entered
+
+/* Scrolling */
+Ctrl-F - forward screen
+Ctrl-B - backward screen
+Ctrl-D - down half screen
+Ctlr-U - up half screen
+
+/* Moving withing braces or comments */
+[(
+[{
+[* - back to unclosed comment
+][ - end of current section
+[] - end of previous section
+
+/* Goto column <n> */
+<n>|
+
+/* Scroll current line to top of window */
+zt
+
+/* Lookup word under cursor in man pages */
+K
+
+/* Close current window */
+Ctrl-w c
+
+/* Regexp cheatsheet */
+. - Any single character except newline
+* - zero or more occurances of any character
+[...] - Any single character specified in the set
+[^...] - Any single character not specified in the set
+\< - Matches beginning of word
+\> - Matches end of word
+^ - Anchor - beginning of the line
+$ - Anchor - end of line
+\(...\) - Grouping - usually used to group conditions
+[...]{m} - look for m occurances of the Set
+[...]{m,n} - look for atleast m occurances but no more than n
+
+/* Working with buffers */
+:ls - lists all open buffers
+:bn - next buffer
+:bp - prev buffer
+:bd - delete buffer
+:b<n> - open buffer n
+:b <tab> - autocomplete buffer names
+:bnext | bdelete # - delete the next buffer
+
+/* Working with tabs */
+:tabn - next tab
+:tabp - prev tab
+:tabc - close tab
+:tabnew <filename> - open a new tab
+:tabs - list all tabs
+gt and gT - to navigate between tabs
+
+/* Indentation */
+>%   Increase indent of a braced or bracketed block (place cursor on brace first)
+=%   Reindent a braced or bracketed block (cursor on brace)
+<%   Decrease indent of a braced or bracketed block (cursor on brace)
+=i{  Re-indent the 'inner block', i.e. the contents of the block
+=a{  Re-indent 'a block', i.e. block and containing braces
+=2a{ Re-indent '2 blocks', i.e. this block and containing block
+>i{  Increase inner block indent
+<i{  Decrease inner block indent
+:< and :> Given a range, apply indentation e.g.
+:4,8>   indent lines 4 to 8, inclusive
+
+/* Indentation in Insert mode */
+CTRL-T   insert indent at start of line
+CTRL-D   remove indent at start of line
+0 CTRL-D remove all indentation from line
+
+/* Show number of lines in file */
+:=
+
+/* Cursor position info */
+gCtrl-g
+
+/* Char value */
+ga
+
+/* Join without spacing */
+gJ
+
+/* Insert at last position */
+gi
+
+/* Change the buffer to Hex Dump */
+:%!xxd
+
+/* Delete extra lines */
+:%s/\(\n\n\)\+/\1/g
+
+/* Saving/restoring sessions
+:mksession your_session.vim
+vim -S your_session.vim
+
+/* Operate on all buffers/windows/tabs */
+bufdo, windo, tabdo
+
+/* To convert the file use fileformat command */
+:set ff?
+:set ff=dos
+:set ff=unix
+
+/* Format a table */
+:%!column -t
+:'<,'>!column -t
+
+/* Use bash calculator */
+Select a line
+!bc - usage: ibase=x; obase=x; <equation>
+
+/* Change decimal to hex */
+:s/<Ctrl-R><Ctrl-W>/\=printf('%x', <Ctrl-R><Ctrl-W>)
+
+/* Show only matching/non matching lines */
+:g/pattern/ - matching
+:g!/pattern/ - nonmatching
+:v/pattern/ - nonmatching
+
+/* Delete all matching/non matching lines */
+:g/pattern/d - matching
+:g!/pattern/d - nonmatching
+:v/pattern/d - nonmatching
+
+/* Use mouse in Vim */
+:set mouse=a (a for all, n for normal, v for visual, i for insert)
+
+/* count number of lines */
+!<motion>
+
+/* File browsing commands */
+d - make new directory
+D - delete
+R - rename
+
+/* Display the man page for word under cursor */
+K
+
+/* Open mulitple files in vertically split window */
+vim -O<n> <file> ... n
+( -o for horizontally split window )
+
+/* Open multiple files in separate tabs */
+vim -p <filename> ...
+
+/* Using Vim File Explorer */
+<del>           Deleting Files or Directories
+-               Going Up
+a               Hiding Files or Directories
+mb              Bookmarking a Directory
+gb              Changing to a Bookmarked Directory
+c               Make Browsing Directory The Current Dir
+d               Make A New Directory
+D               Deleting Files or Directories
+<c-h>           Edit File/Directory Hiding List
+i               Change Listing Style
+<c-l>           Refreshing the Listing
+o               Browsing with a Horizontal Split
+p               Use Preview Window
+P               Edit in Previous Window
+q               Listing Bookmarks and History
+r               Reversing Sorting Order
+R               Rename
+s               Change the sorting style
+<enter>         Open the file in the current window.
+o               Horizontally split window and display file
+v               Vertically split window and display file
+p               Use the preview-window
+P               Edit in the previous window
+t               Open file in a new tab
+T               Open file in a new tab silently
+
+/* Append to each line in a file */
+:%norm A<text to be appended>
+
+/* Word completion */
+Ctrl-X in insert mode +
+Ctrl-n keywords in current file
+Ctrl-i keywords in current and included files
+Ctrl-] Tags
+Ctrl-f Filenames
+Ctrl-d Definitions or macros
+Ctrl-p For searching in current file (used without Ctrl-X)
+
+/* Command mode in Insert mode */
+Ctrl-o while in insert mode
+
+/* Switch between replace and insert mode */
+<Insert> - while in Insert/Replace mode
+
+/* Repeat last substitute */
+:&
+
+/* List included files */
+:che
+
+/* Copy within parantheses */
+y<num>i) : <num> number of levels
+
+/* Copy within parantheses, including parantheses */
+y<num>a) : <num> number of levels
+
+/* Open current window in new tab */
+<Ctrl-W> <Shift-T>
+
+/* Go to last access window (useful when more than two windows) */
+<Ctrl-w> p
+
+/* Netrw */
+Ctrl-l - refresh the directory window
+d - make a new directory
+D - attempt to remove marked file(s) or directory(ies)
+gh - quick hide/unhide of dot-files
+i - Cycle between thin, long, wide, and tree listings
+mb - bookmark current directory
+{cnt}mB - delete a bookmark
+{cnt}gb - go to bookmarked directory
+qb - list all bookmarks
+mf - mark a file
+mF - unmark a file
+mu - unmark all marked files
+md - Apply diff to marked files (up to 3)
+me - edit marked files
+mg - apply vimgrep to marked files
+mt - mark current directory as marked-file target
+mc - copy marked files to marked-file target dir
+mm - move marked files to marked-file target dir
+mz - compress/decompress marked files
+qf - display information on file
+R - rename the marked file(s)/directory(ies)
+s - select sorting style: name, time or file size
+t - open the file/dir in new tab
+v - open the file/dir in new vertical split
+:Rex - return to explorer window/file edit window
+gp - change file permission
+:MF pattern - mark files with a pattern
+mr - prompt asking for a pattern
+
+/* Exploring with patterns */
+*/filepat - list of matching files in current directory
+**/filepat - list of matching files in current directory and below
+use :Nex and :Pex to browse the list
+
+[I - show lines with matching word under cursor
+
+'[, `[  - First line or character of previously changed or yanked text.
+'], `] 	- Last line or character of previously changed or yanked text.
+'<, `< 	Beginning line or character of last visual selection.
+'>, `> 	Ending line or character of last visual selection.
+'., `. 	Position where last change was made.
+
+/* Nerdtree */
+\o - Open nerd tree in all open tabs
+\O - Close nerd tree in all open tabs
+\n - Toggle nerd tree in current tab
+s - open file in vsplit
+t - open file in tab
+T - open file in tab silently
+o - open/close directory
+u - move tree root up a dir
+r - refresh cursor dir
+R - refresh current root
+p - go to parent
+K - go to first child
+A - Zoom (maxim­ize­-mi­nimize) the NERDTree window

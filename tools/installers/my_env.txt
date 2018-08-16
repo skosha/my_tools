@@ -1,0 +1,16 @@
+# Tmux
+sudo apt-get install tmux
+    or
+brew install tmux
+
+# tmuxp
+pip install --user tmuxp
+# Update to latest version
+pip install tmuxp -U
+mkdir .tmuxp
+tmuxp load <session_name>
+
+# install xsel for tmux-yank
+sudo apt-get install xsel
+    or
+brew install reattach-to-user-namespace

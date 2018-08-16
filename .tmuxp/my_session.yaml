@@ -1,0 +1,40 @@
+session_name: work
+windows:
+    - window_name: bash
+      layout: tiled
+      shell_command_before:
+          - cd ~/
+      panes:
+          - shell_command:
+              - vi .tmux.conf
+          - shell_command:
+              - vi .tmuxp/my_session.yaml
+          - shell_command:
+              - cd .dot-config
+          - shell_command:
+              - vi commands.txt
+    - window_name: Dev
+      layout: main-horizontal
+      start_directory: ~/repos/scsc-fw-dev/fw/wlan/mac
+      focus: true
+      options:
+        main-pane-height: 48
+      panes:
+          - shell_command:
+              - vi -S my_session.vim
+          - shell_command:
+              - cd ~/repos/scsc-fw-dev/fw/common
+    - window_name: release
+      layout: 9a88,204x68,0,0[204x58,0,0,19,204x9,0,59,20]
+      start_directory: ~/repos/scsc-fw-consolidated_1/fw/wlan/mac
+      panes:
+          - shell_command:
+              - vi -S my_session.vim
+          - shell_command:
+              - cd ~/repos/scsc-fw-consolidated_1/fw/common
+    - window_name: CATS
+      layout: main-horizontal
+      start_directory: ~/repos/cats/tests/unifi/firmware/maxwell
+      panes:
+          - shell_command:
+              - vi -S my_session.vim

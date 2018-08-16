@@ -1,0 +1,4 @@
+rm -rf cscope*
+find . -name '*.h' -o -name '*.c' -o -name '*.inc' -o -name '*.cpp' > cscope.files
+export TMPDIR=/tmp
+cscope -b

@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Fix for using Ctrl-S in Vim
+stty -ixon
+
+# some more ls aliases
+alias ll='ls -alFX' # Sort by type
+alias la='ls -AX' # Sort by type
+alias l='ls -CF'
+
+alias screen='screen -A'
+
+# My git aliases
+alias gitl='git log'
+alias st='git status'
+alias pull='git pull'
+alias rebase='git rebase $(git branch | fzf)'
+alias co='git checkout'
+alias br='git branch'
+alias n-br='git checkout -b'
+alias commit='git commit'
+alias a-commit='git commit --amend'
+alias add='git add'
+alias add-all='git add --all'
+alias g-show='git show'
+alias gn-show='git show --name-only'
+alias stash='git stash'
+alias a-stash='git stash apply $(git stash list | fzf | cut -d':' -f1)'
+alias s-stash='git show $(git stash list | fzf | cut -d':' -f1)'
+alias ci='git checkout $(git branch | fzf)'
+alias b-del='git branch -D $(git branch | fzf)'
+alias r-file='git reset HEAD $(git status | fzf -m | cut -d':' -f2)'
+alias flog='git log --graph --abbrev-commit --decorate --all --format=format:"%C(bold blue)%h%C(reset) - %C(bold cyan)%cD%C(dim white) - %an%C(reset) %C(bold green)(%cr)%C(reset)%C(bold yellow)%d%C(reset)%n %C(white)%s%C(reset)"'
+
+# Grep aliases
+alias grep='grep --exclude=\*.{bin,out,t32,elf,o,a}'
+
+g-revert() {
+    if [ ! -n "$1" ]; then
+        git checkout $(git status | fzf -m | cut -d':' -f2)
+    else
+        git checkout "$1" $(git status | fzf -m | cut -d':' -f2)
+    fi
+}
+
+source ~/.dot-config/most.sh

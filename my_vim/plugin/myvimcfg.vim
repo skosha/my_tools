@@ -22,6 +22,7 @@ set autoindent                  " set auto indent on
 set smartindent                 " Set smart indent on
 set smarttab                    " Set smart tabbing on
 set shiftwidth=4                " Shiftwidth to be 4
+set softtabstop=4
 set expandtab                   " Expand tab to spaces
 set tabstop=4                   " 1 tab = 4 spaces
 set shiftround                  " Round indent to nearest shiftwidth multiple
@@ -121,6 +122,7 @@ set completeopt-=preview " dont show preview window
 " Netrw config
 let g:netrw_liststyle=1     " Long style listing
 let g:netrw_keepdir=1       " Keep current directory immune from browsing directory
+let g:netrw_sort_by="exten"
 
 " No annoying sound on errors
 set noerrorbells
@@ -140,6 +142,9 @@ filetype indent on
 if has("autocmd")
     "autocmd!               " Clear all autocmds in the group
     autocmd FileType make setlocal noexpandtab
+
+    " Don't let too long lines to be written in text format
+    autocmd FileType txt setlocal wrapmargin=500
 
     " Automatically remove all trailing whitespace
     autocmd BufWritePre * :%s/\s\+$//e
@@ -179,6 +184,11 @@ if has("autocmd")
     au Syntax * RainbowParenthesesLoadRound         " ()
     au Syntax * RainbowParenthesesLoadSquare        " []
     au Syntax * RainbowParenthesesLoadBraces        " {}
+
+    " Python
+    au BufNewFile,BufRead *.py
+        \ set textwidth=79
+        \ set fileformat=unix
 endif
 
 " function to toggle the number mode
@@ -189,7 +199,7 @@ function! g:ToggleNuMode()
     set relativenumber
   endif
 endfunc
-noremap <C-l> :call g:ToggleNuMode()<CR>
+noremap <C-n> :call g:ToggleNuMode()<CR>
 
 " Set print options
 set popt=syntax:y,number:y,wrap:y,left:0pt
@@ -204,9 +214,9 @@ if has('gui') && has('gui_running')
     set guioptions-=L   "no left-side scrollbar
     set guioptions+=b   "show bottom scrollbar
     set guioptions+=F   " show footer
-    set textwidth=105
     set columns=115
-    set lines=50
+    " Open maximized windows always
+    au GUIEnter * simalt ~x
 endif
 
 " Set font
@@ -225,7 +235,7 @@ set wrap linebreak  " linebreak - Wrap at word boundary
 set sidescroll=5
 set listchars+=precedes:<,extends:>
 set breakat+={}()"|<>&
-set textwidth=500
+set textwidth=0
 
 " magic/nomagic: changes special chars that can be used in search patterns
 set magic
@@ -240,9 +250,9 @@ set magic
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 try
     if has("win32")
-        set undodir=~/vimfiles/temp_dirs/undodir
+        set undodir=$HOME/vimfiles/temp_dirs/undodir
     else
-        set undodir=~/.vim/temp_dirs/undodir
+        set undodir=$HOME/.vim/temp_dirs/undodir
     endif
     set undofile
 catch
@@ -331,14 +341,26 @@ nnoremap _d :call Hex2Dec()<CR>
 function Hex2Dec()
     " Save cursor position
     let l:save = winsaveview()
+    " goto start of the word
+    exe 'normal! b'
+    let l:start_col = col('.')
     " yank the current word into register 'l'
-    exe 'normal! "ldiw'
+    exe 'normal! "lde'
+    " print the conversion on a new line
+    let l:save_cursor = getcurpos()
+    exe ":normal! o" . printf("%d", @l)
+    " yank the converted value and paste it at the previous cursor location
+    exe 'normal! ^"ldw'
+    call setpos('.', l:save_cursor)
     " check if its end of line
-    if col('.') == col('$')-1
-        exe ":normal! a" . printf("%d", @l)
+    if col('.') == l:start_col
+        exe 'normal! "lP'
     else
-        exe ":normal! i" . printf("%d", @l)
+        exe 'normal! "lp'
     endif
+    " delete the new line
+    exe 'normal! jdd'
+    " Move cursor to original position
     call winrestview(l:save)
 endfunction
 
@@ -347,14 +369,24 @@ noremap _h :call Dec2Hex()<CR>
 function Dec2Hex()
     " Save cursor position
     let l:save = winsaveview()
+    " goto start of the word
+    exe 'normal! b'
+    let l:start_col = col('.')
     " yank the current word into register 'l'
-    exe 'normal! "ldiw'
-    " check if its end of line
-    if col('.') == col('$')-1
-        exe ":normal! a" . printf("0x%x", @l)
+    exe 'normal! "lde'
+    " print the conversion on a new line
+    let l:save_cursor = getcurpos()
+    exe ":normal! o" . printf("0x%x", @l)
+    " yank the converted value and paste it at the previous cursor location
+    exe 'normal! ^"ldw'
+    call setpos('.', l:save_cursor)
+    if col('.') == l:start_col
+        exe 'normal! "lp'
     else
-        exe ":normal! i" . printf("0x%x", @l)
+        exe 'normal! "lP'
     endif
+    " delete the new line
+    exe 'normal! jdd'
     " Move cursor to original position
     call winrestview(l:save)
 endfunction
@@ -367,11 +399,18 @@ function Ascii2Char()
     " yank the current word into register 'l'
     exe 'normal! "ldiw'
     " check if its end of line
+    let l:save_cursor = getcurpos()
+    exe ":normal! o" . nr2char(@l)
+    " yank the converted value and paste it at the previous cursor location
+    exe 'normal! ^"ldw'
+    call setpos('.', l:save_cursor)
     if col('.') == col('$')-1
-        exe ":normal! a" . nr2char(@l)
+        exe 'normal! "lp'
     else
-        exe ":normal! i" . nr2char(@l)
+        exe 'normal! "lP'
     endif
+    " delete the new line
+    exe 'normal! jdd'
     " Move cursor to original position
     call winrestview(l:save)
 endfunction
@@ -564,10 +603,20 @@ nnoremap _g :GitGutterToggle<cr>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Ale Lint
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-nmap _a <Plug>(ale_next_wrap)
+nmap _al <Plug>(ale_next_wrap)
 " Only run linting when saving the file
 let g:ale_lint_on_text_changed = 'never'
 let g:ale_lint_on_enter = 0
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Git-blame
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nnoremap ,s :<C-u>call gitblame#echo()<CR>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => fzf
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set rtp+=~/.fzf
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CSCOPE settings for vim
@@ -598,7 +647,8 @@ let g:ale_lint_on_enter = 0
 " This tests to see if vim was configured with the '--enable-cscope' option
 " when it was compiled.  If it wasn't, time to recompile vim...
 if has('win32')
-    set csprg=C:\Work\Tools\my_gvim\cscope.exe
+    "set csprg=C:\Work\Tools\my_gvim\cscope.exe
+    set csprg=$VIM/vimfiles/cscope.exe
     let $TMP="C:/tmp"
 else
     set csprg=/usr/bin/cscope
@@ -630,7 +680,11 @@ if (g:cscope_loaded == 0)
     set cscopeverbose
 
     " Use relative path from cscope.out directory
-    set cscoperelative
+    if has('win32')
+        set nocscoperelative
+    else
+        set cscoperelative
+    endif
 
     """"""""""""" My cscope/vim key mappings
     "

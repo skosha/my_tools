@@ -20,3 +20,14 @@ au FileType python map <buffer> <leader>D ?def
 au FileType python set cindent
 au FileType python set cinkeys-=0#
 au FileType python set indentkeys-=0#
+
+au FileType python nnoremap <LocalLeader>= :0,$!yapf<CR>
+
+au BufNewFile,BufRead *.py
+    \ set textwidth=79
+    \ set fileformat=unix
+
+au BufNewFile,BufRead *.js, *.html, *.css
+    \ set tabstop=2
+    \ set softtabstop=2
+    \ set shiftwidth=2

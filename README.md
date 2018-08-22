@@ -1,2 +1,2 @@
 # my_tools
-vim customizations, plugins, cscope, etc.
+tools, vim customizations, plugins, cscope, etc.

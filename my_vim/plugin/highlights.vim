@@ -301,3 +301,25 @@ function! s:Highlight(args) range
   echo 'Error: First argument must be highlight number 1..99'
 endfunction
 command! -nargs=* -range Highlight call s:Highlight('<args>')
+
+function! s:HighlightFilter(args)
+    if type(a:args) == type(0)
+        call s:MatchToggle()
+        return
+    endif
+    if filereadable(a:args)
+        let hlnum = 1
+        let decade = 0
+        for pattern in readfile(a:args)
+            call s:DoHighlight(hlnum, pattern, decade)
+            let hlnum += 1
+            if hlnum > 9
+                let hlnum = 1
+                let decade += 1
+            endif
+        endfor
+        call s:MatchToggle()
+    endif
+endfunction
+command! -nargs=1 -complete=file FilterFile call s:HighlightFilter('<args>')
+command! NoFilterFile call s:HighlightFilter(0)

@@ -35,12 +35,50 @@ alias flog='git log --graph --abbrev-commit --decorate --all --format=format:"%C
 # Grep aliases
 alias grep='grep --exclude=\*.{bin,out,t32,elf,o,a}'
 
+# Moving around
+alias ..='cd ..'
+alias .2='cd ../../'
+alias .3='cd ../../../'
+alias .4='cd ../../../../'
+alias .5='cd ../../../../../'
+
+# Finding stuff!
+alias fd='find . -type d -iname'
+alias ff='find . -type f -iname'
+
+# Check for macOS updates
+alias upc='softwareupdate -l'
+
+# Download and install macOS updates
+alias upd='softwareupdate -i -a'
+
 g-revert() {
     if [ ! -n "$1" ]; then
         git checkout $(git status | fzf -m | cut -d':' -f2)
     else
         git checkout "$1" $(git status | fzf -m | cut -d':' -f2)
     fi
+}
+
+r-sync() {
+    next=$PWD
+    substr=scsc-fw-
+    while :
+    do
+        if [[ $next = ${next#*$substr} ]] ; then
+            break
+        elif [[ $next == "/" ]] ; then
+            echo "ERROR: could not find scsc-fw-* directory"
+            exit 1
+        else
+            repo_dir=$next
+            next=$(dirname $next)
+        fi
+    done
+
+    pushd $repo_dir
+    repo sync
+    popd
 }
 
 source ~/.dot-config/most.sh

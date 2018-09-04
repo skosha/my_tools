@@ -1,0 +1,47 @@
+
+sudo softwareupdate -i -a --restart
+
+https://null-byte.wonderhowto.com/how-to/mac-for-hackers-install-iterm2-using-terminal-0174142/
+
+By default, word jumps (option + → or ←) and word deletions (option + backspace) do not work. To enable these, go to "iTerm → Preferences → Profiles → Keys → Load Preset... → Natural Text Editing → Boom! Head explodes"
+
+
+Go to iTerm2 > Preferences > Profiles > Colors Tab
+Click Color Presets... at the bottom right
+Click Import...
+Select the material-design-colors.itermcolors file
+Select the material-design-colors from Load Presets...
+
+Copy/Paste configurations:
+- iTerm2 has a setting that allows terminal applications to access the clipboard.
+  This works through ANSI escape sequences, and you actually want this OFF.
+  iTerm2 -> Preferences -> General -> "Allow clipboard access to terminal apps" OFF
+-
+
+https://www.reddit.com/r/unixporn/comments/5vke7s/osx_iterm2_tmux_vim/
+
+https://github.com/hyiltiz/vim-plugins-profile
+
+https://addons.mozilla.org/en-US/firefox/addon/vimfx/
+
+https://www.emacswiki.org/emacs/MovingTheCtrlKey
+
+https://superuser.com/questions/825441/arrow-keys-work-like-optionarrow-in-terminal-in-tmux-on-osx
+
+http://tangledhelix.com/blog/2012/04/28/iterm2-keymaps-for-tmux/
+
+https://gist.github.com/spicycode/1229612
+
+https://apple.stackexchange.com/questions/208387/copy-to-clipboard-from-tmux-in-el-capitan/248828#248828
+
+https://www.cl.cam.ac.uk/~osc22/tutorials/vim_line_endings.html
+
+https://dotfiles.github.io/
+
+https://realpython.com/vim-and-python-a-match-made-in-heaven/
+
+http://fideloper.com/mac-vim-tmux
+
+https://medium.com/@mglover/setting-up-osx-terminal-and-vim-a62a1d09c9de
+
+https://www.fullstackpython.com/vim.html
